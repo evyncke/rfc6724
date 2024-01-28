@@ -68,6 +68,19 @@ function getLabel(a) {
 	return 1 ; // No need to match to ::/0 ;-)
 }
 
+function getPrecedence(a) {
+	// Try table entries, starting with the longuest prefix
+	if (a.match(loopback)) return 50 ;
+	if (a.match(v4mapped)) return 35 ;
+	if (a.match(v4compatible)) return 1 ;
+	if (a.match(teredo)) return 5 ;
+	if (a.match(six2four)) return 30 ;
+	if (a.match(sixbone)) return 1 ;
+	if (a.match(siteLocal)) return 1 ;
+	if (a.match(ula)) return 3 ;
+	return 40 ; // No need to match to ::/0 ;-)
+}
+
 function addrChanged(elem) {
 	if (elem.value == '') return ;
 	let span = document.getElementById('span_' + elem.id) ;
@@ -118,7 +131,8 @@ function addrChanged(elem) {
 			else
 				addressPairs.splice(1, 1) ;
 		}
-		document.getElementById('das').innerHTML += '<p>The best pair of &lt;source, destination&gt; is: &lt;' +
+		document.getElementById('das').innerHTML += '<h2>Final addresses</h2>' +
+			'<p>The best pair of &lt;source, destination&gt; is: &lt;' +
 			addressPairs[0].source.toString() + ', ' + addressPairs[0].destination.toString() + '&gt;.</p>' ;
 	} else {
 		document.getElementById('das').innerHTML = '' ;
@@ -283,6 +297,21 @@ function compareDestination(a, b) {
 		dasLog.innerHTML += '<p>The second pair has matching labels while the first one does not, preferring the second pair.</p>' ;
 		return -1 ;
 	}
+	dasLog.innerHTML += '<p>Both pairs have matching labels, continuing with next rule.</p>' +
+		'<h4>Rule 6: Prefer higher precedence</h4>' ;
+	let precedenceDA = getPrecedence(a.destination) ;
+	let precedenceDB = getPrecedence(b.destination) ;
+	if (precedenceDA > precedenceDB) {
+		dasLog.innerHTML += '<p>Precedence of ' + a.destination.toString() + '(' + precedenceDA + ') is greater than the precedence of ' +
+			b.destination.toString() + '(' + precedenceDB + '), therefore ' + a.destination.toString() + ' is selected.</p>' ;
+		return 1 ;
+	}
+	if (precedenceDA < precedenceDB) {
+		dasLog.innerHTML += '<p>Precedence of ' + a.destination.toString() + '(' + precedenceDA + ') is less than the precedence of ' +
+			b.destination.toString() + '(' + precedenceDB + '), therefore ' + b.destination.toString() + ' is selected.</p>' ;
+		return -1 ;
+	}
+	dasLog.innerHTML += '<p>Both have the same precedence (' + precedenceDA + '), continuing with the next rule.</p>' ;
 	return 1 ;
 }
 
