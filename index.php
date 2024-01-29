@@ -64,14 +64,17 @@ Address#2: <input type="text" id="src2" onkeyup="addrChanged(this);" length="32"
 </div><!-- col -->
 
 <div class="col-xs-12 col-md-6">
-<h2>Destination addresses</h2>
+<h2>Destination address(es)</h2>
 Address#1: <input type="text" id="dst1" onkeyup="addrChanged(this);" length="32">
 <span id="span_dst1"></span>
 <br/>
 Address#2: <input type="text" id="dst2" onkeyup="addrChanged(this);" length="32">
 <span id="span_dst2"></span>
 </div><!-- col -->
-<p>You need to input two valid source IPv6 addresses and at least one valid destination IPv6 address.</p>
+<p>You need to input two valid source IPv6 addresses and at least one valid destination IPv6 address.
+The address scope, label, and preference are automatically computed and displayed. As soon as
+two source addresses and at least one destination address are validated, then the best
+pair of source and destination is evaluated against RFC 6724.</p>
 </div><!--row-->
 <span id="sas"></span>
 <span id="das"></span>

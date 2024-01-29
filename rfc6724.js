@@ -87,7 +87,7 @@ function addrChanged(elem) {
 	try {
 		var a = ipaddr.parse(elem.value) ;
 	} catch (err) {
-		span.innerHTML = '<span style="color: red;">invalid</span>' ;
+		span.innerHTML = '<i class="bi bi-ban-fill text-danger"></i>' ;
 		elem.style.borderColor = 'red' ;
 		elem.style.color = 'red' ;
 		return ;
@@ -96,12 +96,12 @@ function addrChanged(elem) {
 		span.innerHTML = '<span style="color: red;">Not an IPv6 address</span>' ;
 		elem.style.borderColor = 'red' ;
 		elem.style.color = 'red' ;
-		return ;
+//		return ;
 	}
 	elem.style.color = 'initial' ;
 	elem.style.borderColor = 'initial' ;
 	scope = getScope(a) ;
-	span.innerHTML = "scope: " + scopeName[scope] ;
+	span.innerHTML = '<i class="bi bi-check-circle-fill text-success"></i>Scope: ' + scopeName[scope] + ', label: ' + getLabel(a) +', precedence: ' + getPrecedence(a);
 	// Let's recompute everything
 	// Let's look at all src for all dst
 	addressPairs = [] ;
@@ -110,12 +110,12 @@ function addrChanged(elem) {
 	// Check the best pair <src, dst>
 	if (addressPairs.length == 0) {
 		document.getElementById('das').innerHTML = '<h2>Destination address selection</h2>' +
-			'There is only one pair of <source, destination> addresses, i.e., the selected source is ' +
+			'There is only one selected pair of <source, destination> addresses, i.e., the selected source is ' +
 			addressPairs[0].source.toString() + ' and the destination is ' +
 			addressPairs[0].destination.toString() + '.' ;
 	} else if (addressPairs.length > 0) {
 		document.getElementById('das').innerHTML = '<h2>Destination address selection</h2>' +
-			'There are ' + addressPairs.length + ' pair(s) of &lt;source, destination&gt; addresses:<ol>' ;
+			'There are ' + addressPairs.length + ' selected pair(s) of &lt;source, destination&gt; addresses:<ol>' ;
 		for (var i = 0; i < addressPairs.length; i++) {
 			document.getElementById('das').innerHTML += '<li> &lt;' +
 				addressPairs[i].source.toString() + ', ' +
