@@ -53,6 +53,11 @@ Using code from https://github.com/whitequark/ipaddr.js
 <body onload="init();">
 <h1>RFC 6724 on-line</h1>
 
+<p><small>You need to input two valid source IPv4/IPv6 addresses and at least one valid destination IPv4/IPv6 address.
+The address scope, label, and preference are automatically computed and displayed. As soon as
+two source addresses and at least one destination address are validated, then the best
+pair of source and destination is evaluated against RFC 6724.</small></p>
+
 <div class="row">
 <div class="col-xs-12 col-md-6">
 <h2>Source addresses</h2>
@@ -71,11 +76,8 @@ Address#1: <input type="text" id="dst1" onkeyup="addrChanged(this);" length="32"
 Address#2: <input type="text" id="dst2" onkeyup="addrChanged(this);" length="32">
 <span id="span_dst2"></span>
 </div><!-- col -->
-<p>You need to input two valid source IPv6 addresses and at least one valid destination IPv6 address.
-The address scope, label, and preference are automatically computed and displayed. As soon as
-two source addresses and at least one destination address are validated, then the best
-pair of source and destination is evaluated against RFC 6724.</p>
 </div><!--row-->
+<hr>
 <div class="row">
 <div id="policy" class="col-md-6 w-auto"></div><!-- policy-->
 </div><!-- row -->
