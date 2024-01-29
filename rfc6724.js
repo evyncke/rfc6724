@@ -1,7 +1,3 @@
-// TODO handle IPv4 address in dotted decimal
-// TODO use policy table for scopes
-// TODO use bootstrap accordion to hide some text
-//
 /*
    Copyright 2024 Eric Vyncke, eric@vyncke.org
 
@@ -406,7 +402,25 @@ function compareDestination(a, b, detailsDivId) {
 			b.destination.toString() + '(' + precedenceDB + '), therefore ' + b.destination.toString() + ' is selected.</p>' ;
 		return -1 ;
 	}
-	dasLog.innerHTML += '<p>Both have the same precedence (' + precedenceDA + '), continuing with the next rule.</p>' ;
+	dasLog.innerHTML += '<p>Both have the same precedence (' + precedenceDA + '), continuing with the next rule.</p>' +
+		'<h4>Rule 7: Prefer native transport</h4>' +
+		'<p>Some encapsulation mechanisms do not have reserved prefix, hence this page cannot apply this rule, continuing to the next rule.</p>' +
+		'<h4>Rule 8: Prefer smaller scope</h4>' ;
+	scopeDA = getScope(a.destination) ;
+	scopeDB = getScope(b.destination) ;
+	if (scopeDA < scopeDB) {
+		dasLog.innerHTML += '<p>The scope of the first destination address (' + scopeDA + ') is less than the scope of the second address (' + scopeDB + '), ' +
+			'then the first address, ' + a.destination.toString() + ', is preferred.</p>' ;
+		return +1 ;
+	}
+	if (scopeDA > scopeDB) {
+		dasLog.innerHTML += '<p>The scope of the second destination address (' + scopeDB + ') is less than the scope of the first address (' + scopeDA + '), ' +
+			'then the second address, ' + b.destination.toString() + ', is preferred.</p>' ;
+		return -1 ;
+	}
+	// TODO display scope names rather than numbers
+	dasLog.innerHTML += '<p>The scopes of both destination addresses are identical (' + scopeDA + '), continuing to next rule.</p>' +
+		'<h4>Rule 9: Use longest matching prefix</h4>' ;
 	return 1 ;
 }
 
