@@ -14,6 +14,39 @@
    limitations under the License.
 */
 
+// Policy class
+class RFC6724policyRow {
+	constructor(name, prefix, prefixLength, precedence, label) {
+		this.name = name ;
+		this.prefix = prefix ;
+		this.prefixLength = prefixLength ;
+		this.cidr = ipaddr.parseCIDR(prefix + '/' + prefixLength) ;
+		this.precedence = precedence ;
+		this.label = label ;
+	}
+}
+
+class RFC6724policy {
+	constructor() {
+		this.rows = [] ;
+	}
+	add(name, prefix, prefixLength, precedence, label) {
+		this.rows.push(new RFC6724policyRow(name, prefix, prefixLength, precedence, label)) ;
+	}
+	toHTML() {
+		let s = '<table class="table table-hover table-striped table-bordered">' +
+			'<thead><tr><th>Type</th><th>Prefix</th><th>Precedence</th><th>Label</th></tr></thead>' +
+			'<tbody class="table-divider">' ;
+		for (let i = 0 ; i < this.rows.length; i++)
+				s += '<tr><td>' + this.rows[i].name + '</td><td>' + this.rows[i].cidr.toString() + 
+					'</td><td>' + this.rows[i].precedence + '</td><td>' + this.rows[i].label + '</td></tr>' ;
+		s += '</tbody></table>' ;
+		return s ;
+	}
+}
+
+var policy = new RFC6724policy() ;
+
 // For scopes
 var scopeName = ['link', 'site', 'global'] ;
 const lla = ipaddr.parseCIDR('fe80::/10') ;
@@ -316,6 +349,18 @@ function compareDestination(a, b) {
 }
 
 function init() {
+	// Fill in the policy
+	policy.add('loopback', '::1', 128, 50, 0) ;
+	policy.add('default', '::', 0, 40, 1) ;
+	policy.add('IPv4 mapped','::ffff:0:0', 96, 35, 4) ;
+	policy.add('6to4', '2002::', 16, 30, 2) ;
+	policy.add('teredo', '2001::', 32, 5, 5) ;
+	policy.add('ULA', 'fc00::', 7, 3, 13) ;
+	policy.add('IPv4-compatible', '::', 96, 1, 3) ;
+	policy.add('Site-local (deprecated)', 'fec0::', 10, 1, 11) ;
+	policy.add('6bone (returned)', '3ffe::', 16, 1, 12) ;
+	document.getElementById('policy').innerHTML = policy.toHTML() ;
+
 	// Some tests
 	document.getElementById('src1').value = '2001:db8::1' ;
 	document.getElementById('src2').value = 'fe80::1' ;

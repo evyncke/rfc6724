@@ -76,6 +76,9 @@ The address scope, label, and preference are automatically computed and displaye
 two source addresses and at least one destination address are validated, then the best
 pair of source and destination is evaluated against RFC 6724.</p>
 </div><!--row-->
+<div class="row">
+<div id="policy" class="col-md-6 w-auto"></div><!-- policy-->
+</div><!-- row -->
 <span id="sas"></span>
 <span id="das"></span>
 </body>
