@@ -75,14 +75,19 @@ var policy = new RFC6724policy() ;
 // For scopes
 var scopeName = ['link', 'site', 'global'] ;
 const lla = ipaddr.parseCIDR('fe80::/10') ;
+const ipv4lla = ipaddr.parseCIDR('169.254.0.0/16') ;
+const ipv4loopback = ipaddr.parseCIDR('127.0.0.0/8') ;
 const siteLocal = ipaddr.parseCIDR('fec0::/10') ;
 const gua = ipaddr.parseCIDR('2000::/3') ;
 const ula = ipaddr.parseCIDR('fc00::/7') ;
 const mcast = ipaddr.parseCIDR('ff00::/8') ;
 
 function getScope(a) {
-	if (a.kind() == 'ipv4') // If IPv4 address, then let's make it IPv6
-		a = a.toIPv4MappedAddress() ;
+	if (a.kind() == 'ipv4') { // See RFC 6724 section 3.2
+		if (a.match(ipv4lla)) return 0 ; // Link scope
+		if (a.match(ipv4loopback)) return 0 ; // Link scope
+		return 2 ; // Else global
+	}
 	if (a.match(lla)) return 0 ; // Link-local scope is 0
 	if (a.match(siteLocal)) return 1 ; // Site-local scope is 1
 	if (a.match(gua)) return 2 ; // GUA is global scope
