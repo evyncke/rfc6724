@@ -133,7 +133,9 @@ function addrChanged(elem) {
 	addressPairs = [] ;
 	document.getElementById('sas').innerHTML = '<h2>Source address selection</h2>' ;
 	runSourceRules('dst1') ;
+	document.getElementById('sas').innerHTML += displaySources('dst1') ;
 	runSourceRules('dst2') ;
+	document.getElementById('sas').innerHTML += displaySources('dst2') ;
 	// Check the best pair <src, dst>
 	if (addressPairs.length == 1) {
 		document.getElementById('das').innerHTML = '<h2>Destination address selection</h2>' +
@@ -300,6 +302,20 @@ function runSourceRules(dstId) {
 		addressPairs.push({source: sa, destination: d}) ;
 		addressPairs.push({source: sb, destination: d}) ;
 	}
+}
+
+// generate HTML with the selected address(es) for destination
+function displaySources(dstId) {
+	let dst = document.getElementById(dstId).value ;
+	let d =ipaddr.parse(dst) ;
+	let s = '<p class="text-info">The selected source address(es) for destination ' + d.toString() + ' is/are: ' ;
+	for (let i = 0 ; i < addressPairs.length ; i++) {
+		if (addressPairs[i].destination.toString() == d.toString())
+			s += addressPairs[i].source.toString() + ' ' ;
+	}
+	s += '.</p>' ;
+	return s ;
+
 }
 
 // Compare two sets of <src, dst> addresses, return +1 if a should be preferred, 0 if a is the same as b, else -1
