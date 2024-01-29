@@ -264,6 +264,15 @@
             return matchCIDR(this.octets, other.octets, 8, cidrRange);
         };
 
+	IPv4.prototype.commonPrefixLength = function (other) {
+            if (other.kind() !== 'ipv4') {
+                throw new Error('ipaddr: cannot match ipv6 address with non-ipv6 one');
+            }
+
+	    return matchLength(this.toByteArray(), other.toByteArray()) ;
+	}
+
+
         // returns a number of leading ones in IPv4 address, making sure that
         // the rest is a solid sequence of 0's (valid netmask)
         // returns either the CIDR length or null if mask is not valid
