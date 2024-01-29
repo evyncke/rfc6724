@@ -113,6 +113,8 @@ function scopeToString(a) {
 
 function addrChanged(elem) {
 	if (elem.value == '') return ;
+	document.getElementById('sas').innerHTML = '' ;
+	document.getElementById('das').innerHTML = '' ;
 	let span = document.getElementById('span_' + elem.id) ;
 	try {
 		var a = ipaddr.parse(elem.value) ;
@@ -127,9 +129,9 @@ function addrChanged(elem) {
 	scope = getScope(a) ;
 	span.innerHTML = '<i class="bi bi-check-circle-fill text-success"></i>Scope: ' + scopeName[scope] + ', precedence: ' + policy.getPrecedence(a) + ', label: ' + policy.getLabel(a);
 	// Let's recompute everything
-	document.getElementById('das').innerHTML = '' ;
 	// Let's look at all src for all dst
 	addressPairs = [] ;
+	document.getElementById('sas').innerHTML = '<h2>Source address selection</h2>' ;
 	runSourceRules('dst1') ;
 	runSourceRules('dst2') ;
 	// Check the best pair <src, dst>
@@ -150,13 +152,14 @@ function addrChanged(elem) {
 		// Need to compare each pair to another pair and select the winner...
 		// loop until only one pair is left in the array, comparing one entry to the next one
 		// and keeping only one (the best or any if equivalent) by using .splice() method ?
+		let detailsDiv = 0 ;
 		while (addressPairs.length > 1) {
-			if (compareDestination(addressPairs[0], addressPairs[1]) < 0)
+			if (compareDestination(addressPairs[0], addressPairs[1], detailsDiv++) < 0)
 				addressPairs.splice(0, 1) ;
 			else
 				addressPairs.splice(1, 1) ;
 		}
-		document.getElementById('das').innerHTML += '<h2>Final addresses</h2>' +
+		document.getElementById('das').innerHTML += '<h2>Final selected addresses</h2>' +
 			'<p>The best pair of &lt;source, destination&gt; is: &lt;' +
 			addressPairs[0].source.toString() + ', ' + addressPairs[0].destination.toString() + '&gt;.</p>' ;
 	} else {
@@ -173,8 +176,26 @@ function runSourceRules(dstId) {
 	sa = ipaddr.parse(src1) ;
 	sb = ipaddr.parse(src2) ;
 	d = ipaddr.parse(dst) ;
-	if (sa.kind() != 'ipv6' || sb.kind() != 'ipv6' || d.kind() != 'ipv6') return ;
-	sasLog.innerHTML += "<h2>Source address(es) selection for destination " + d.toString() + "</h2>" ;
+	sasLog.innerHTML += '<h3>Source address(es) selection for destination ' + d.toString() + 
+		'<a data-bs-toggle="collapse" href="#collapse_' + dstId + '" aria-expanded="false" aria-controls="collapse_' + dstId + '">' +
+		'<i class="bi bi-chevron-expand"></i></a></h3>' +
+		'<div class="collapse" id="collapse_' + dstId + '"><div class="card card-body">' +
+		'<span id="details_' + dstId + '"></span></div></div>' ;
+	sasLog = document.getElementById('details_' + dstId) ;
+	if (sa.kind() == d.kind() && sb.kind() != d.kind()) {
+		sasLog.innerHTML += 'Only source ' + sa.toString() + ' has the same IP version as destination. This address is selected.' ;
+		addressPairs.push({source: sa, destination: d}) ;
+		return ;
+	}
+	if (sa.kind() != d.kind() && sb.kind() == d.kind()) {
+		sasLog.innerHTML += 'Only source ' + sb.toString() + ' has the same IP version as destination. This address is selected.' ;
+		addressPairs.push({source: sb, destination: d}) ;
+		return ;
+	}
+	if (sa.kind() != d.kind() && sb.kind() != d.kind()) {
+		sasLog.innerHTML += 'None of the source has the same IP version as destination. No address is selected.' ;
+		return ;
+	}
 	sasLog.innerHTML += "<h4>Rule 1: Prefer same address</h4>" ;
 	if (sa.toString() == d.toString()) {
 		sasLog.innerHTML += 'Source#1 is the same as Destination#1 => Source#1 (' + sa.toString() + ') will be used.' ;
@@ -282,11 +303,17 @@ function runSourceRules(dstId) {
 }
 
 // Compare two sets of <src, dst> addresses, return +1 if a should be preferred, 0 if a is the same as b, else -1
-function compareDestination(a, b) {
+function compareDestination(a, b, detailsDivId) {
 	let dasLog = document.getElementById('das') ;
 	dasLog.innerHTML += '<h3>Comparing &lt;' + a.source.toString() + ', ' + a.destination.toString() + '&gt; with ' +
-		'&lt;' + b.source.toString() + ', ' + b.destination.toString() + '&gt;</h3>' +
-		'<h4>Rule 1: Avoid unusable destinations</h4>' +
+		'&lt;' + b.source.toString() + ', ' + b.destination.toString() + '&gt;' +
+		'<a data-bs-toggle="collapse" href="#collapse_' + detailsDivId + '" aria-expanded="false" aria-controls="collapse_' + detailsDivId + '">' +
+		'<i class="bi bi-chevron-expand"></i></a></h3>' +
+		'<div class="collapse" id="collapse_' + detailsDivId + '"><div class="card card-body">' +
+		'<span id="details_' + detailsDivId + '"></span></div></div>' ;
+		'</h3>' ;
+	dasLog = document.getElementById('details_' + detailsDivId) ;
+	dasLog.innerHTML = '<h4>Rule 1: Avoid unusable destinations</h4>' +
 		'Assuming that all destinations are reachable, ignoring this rule.' +
 		'<h4>Rule 2: Prefer matching scope</h4>' ;
 	let scopeSA = getScope(a.source) ;
@@ -370,6 +397,8 @@ function init() {
 	document.getElementById('src1').value = '2001:db8:cafe:babe::1' ;
 	document.getElementById('src2').value = '2001:db8:dead:beef::1' ;
 	document.getElementById('dst1').value = '2001:db8:c0ca:babe::2' ;
+	document.getElementById('dst2').value = '2001:db8:beef:babe::2' ;
+	return ;
 	// Two globals but with different length of prefix matching and two dest including ULA
 	document.getElementById('src1').value = '2001:db8:cafe:babe::1' ;
 	document.getElementById('src2').value = 'fd00:dead:beef::1' ;
