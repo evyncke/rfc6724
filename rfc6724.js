@@ -1,3 +1,7 @@
+// TODO handle IPv4 address in dotted decimal
+// TODO use policy table for scopes
+// TODO use bootstrap accordion to hide some text
+//
 /*
    Copyright 2024 Eric Vyncke, eric@vyncke.org
 
@@ -33,8 +37,29 @@ class RFC6724policy {
 	add(name, prefix, prefixLength, precedence, label) {
 		this.rows.push(new RFC6724policyRow(name, prefix, prefixLength, precedence, label)) ;
 	}
+	getPolicy(a) {
+		if (a.kind() == 'ipv4') // If IPv4 address, then let's make it IPv6
+			a = a.toIPv4MappedAddress() ;
+		let bestRow = -1, bestRowPrefixLength = -1 ;
+		for (let i = 0 ; i < this.rows.length; i++)
+			if (a.match(this.rows[i].cidr))
+				if (this.rows[i].prefixLength > bestRowPrefixLength) {
+					bestRowPrefixLength = this.rows[i].prefixLength ;
+					bestRow = i ;
+				}
+		return this.rows[bestRow] ; // Assuming that there will be a matching row
+	}
+	getLabel(a) {
+		let row = this.getPolicy(a) ;
+		return row.label ;
+	}
+	getPrecedence(a) {
+		let row = this.getPolicy(a) ;
+		return row.precedence ;
+	}
 	toHTML() {
-		let s = '<table class="table table-hover table-striped table-bordered">' +
+		let s = '<table class="table table-hover table-striped table-bordered caption-top">' +
+			'<caption class="text-center">RFC 6724 policy table</caption>' +
 			'<thead><tr><th>Type</th><th>Prefix</th><th>Precedence</th><th>Label</th></tr></thead>' +
 			'<tbody class="table-divider">' ;
 		for (let i = 0 ; i < this.rows.length; i++)
@@ -50,23 +75,16 @@ var policy = new RFC6724policy() ;
 // For scopes
 var scopeName = ['link', 'site', 'global'] ;
 const lla = ipaddr.parseCIDR('fe80::/10') ;
+const siteLocal = ipaddr.parseCIDR('fec0::/10') ;
 const gua = ipaddr.parseCIDR('2000::/3') ;
 const ula = ipaddr.parseCIDR('fc00::/7') ;
 const mcast = ipaddr.parseCIDR('ff00::/8') ;
 
-// For labels & preference
-const loopback = ipaddr.parseCIDR('::1/128'),
-	allv6 = ipaddr.parseCIDR('::/0'),
-	v4mapped = ipaddr.parseCIDR('::ffff:0:0/96'),
-	six2four = ipaddr.parseCIDR('2002::/16'),
-	teredo = ipaddr.parseCIDR('2001::/32'),
-	v4compatible = ipaddr.parseCIDR('::/96'),
-	siteLocal = ipaddr.parseCIDR('fec0::/10'), // deprecated
-	sixbone = ipaddr.parseCIDR('3ffe::/16'); // even if returned
-
 function getScope(a) {
+	if (a.kind() == 'ipv4') // If IPv4 address, then let's make it IPv6
+		a = a.toIPv4MappedAddress() ;
 	if (a.match(lla)) return 0 ; // Link-local scope is 0
-	if (a.match(siteLocal)) return 0 ; // Site-local scope is 1
+	if (a.match(siteLocal)) return 1 ; // Site-local scope is 1
 	if (a.match(gua)) return 2 ; // GUA is global scope
 	if (a.match(ula)) return 2 ; // ULA is global scope
 	if (a.match(mcast)) { // more tricky for multicast !!!
@@ -88,32 +106,6 @@ function scopeToString(a) {
 	return 'unknown' ;
 }
 
-function getLabel(a) {
-	// Try table entries, starting with the longuest prefix
-	if (a.match(loopback)) return 0 ;
-	if (a.match(v4mapped)) return 4 ;
-	if (a.match(v4compatible)) return 3 ;
-	if (a.match(teredo)) return 5 ;
-	if (a.match(six2four)) return 2 ;
-	if (a.match(sixbone)) return 12 ;
-	if (a.match(siteLocal)) return 11 ;
-	if (a.match(ula)) return 13 ;
-	return 1 ; // No need to match to ::/0 ;-)
-}
-
-function getPrecedence(a) {
-	// Try table entries, starting with the longuest prefix
-	if (a.match(loopback)) return 50 ;
-	if (a.match(v4mapped)) return 35 ;
-	if (a.match(v4compatible)) return 1 ;
-	if (a.match(teredo)) return 5 ;
-	if (a.match(six2four)) return 30 ;
-	if (a.match(sixbone)) return 1 ;
-	if (a.match(siteLocal)) return 1 ;
-	if (a.match(ula)) return 3 ;
-	return 40 ; // No need to match to ::/0 ;-)
-}
-
 function addrChanged(elem) {
 	if (elem.value == '') return ;
 	let span = document.getElementById('span_' + elem.id) ;
@@ -125,23 +117,18 @@ function addrChanged(elem) {
 		elem.style.color = 'red' ;
 		return ;
 	}
-	if (a.kind() != 'ipv6') {
-		span.innerHTML = '<span style="color: red;">Not an IPv6 address</span>' ;
-		elem.style.borderColor = 'red' ;
-		elem.style.color = 'red' ;
-//		return ;
-	}
 	elem.style.color = 'initial' ;
 	elem.style.borderColor = 'initial' ;
 	scope = getScope(a) ;
-	span.innerHTML = '<i class="bi bi-check-circle-fill text-success"></i>Scope: ' + scopeName[scope] + ', label: ' + getLabel(a) +', precedence: ' + getPrecedence(a);
+	span.innerHTML = '<i class="bi bi-check-circle-fill text-success"></i>Scope: ' + scopeName[scope] + ', precedence: ' + policy.getPrecedence(a) + ', label: ' + policy.getLabel(a);
 	// Let's recompute everything
+	document.getElementById('das').innerHTML = '' ;
 	// Let's look at all src for all dst
 	addressPairs = [] ;
 	runSourceRules('dst1') ;
 	runSourceRules('dst2') ;
 	// Check the best pair <src, dst>
-	if (addressPairs.length == 0) {
+	if (addressPairs.length == 1) {
 		document.getElementById('das').innerHTML = '<h2>Destination address selection</h2>' +
 			'There is only one selected pair of <source, destination> addresses, i.e., the selected source is ' +
 			addressPairs[0].source.toString() + ' and the destination is ' +
@@ -168,7 +155,7 @@ function addrChanged(elem) {
 			'<p>The best pair of &lt;source, destination&gt; is: &lt;' +
 			addressPairs[0].source.toString() + ', ' + addressPairs[0].destination.toString() + '&gt;.</p>' ;
 	} else {
-		document.getElementById('das').innerHTML = '' ;
+		document.getElementById('das').innerHTML = '<p class="text-warning">Cannot select the source/destination addresses.</p>' ;
 	}
 }
 
@@ -252,9 +239,9 @@ function runSourceRules(dstId) {
 		'<h5>Rule 5.5: Prefer addresses in a prefix advertised by the next-hop</h5>' +
 		'No information about prefix and next-hop, this rule is not evaluated.' +
 		'<h4>Rule 6: Prefer matching label</h4>' ;
-	let labelA = getLabel(sa) ;
-	let labelB = getLabel(sb) ;
-	let labelD = getLabel(d) ;
+	let labelA = policy.getLabel(sa) ;
+	let labelB = policy.getLabel(sb) ;
+	let labelD = policy.getLabel(d) ;
 	sasLog.innerHTML += 'Source#1 label is : ' + labelA + '.<br/>' ;
 	sasLog.innerHTML += 'Source#2 label is : ' + labelB + '.<br/>' ;
 	sasLog.innerHTML += 'Destination#1 label is : ' + labelD + '.<br/>' ;
@@ -317,10 +304,10 @@ function compareDestination(a, b) {
 		'<h4>Rule 4: Prefer home addresses</h4>' +
 		'<p>No information about home / care-of addresses, ignoring this rule, evaluation continues to the next rule.</p>' +
 		'<h4>Rule 5: Prefer matching label</h4>' ;
-	let labelSA = getLabel(a.source) ;
-	let labelDA = getLabel(a.destination) ;
-	let labelSB = getLabel(b.source) ;
-	let labelDB = getLabel(b.destination) ;
+	let labelSA = policy.getLabel(a.source) ;
+	let labelDA = policy.getLabel(a.destination) ;
+	let labelSB = policy.getLabel(b.source) ;
+	let labelDB = policy.getLabel(b.destination) ;
 	dasLog.innerHTML += '<p>Labels are &lt;' + labelSA + ', ' + labelDA + '&gt; and &lt;' + labelSB + ', ' + labelDB + '&gt.</p>' ;
 	if (labelSA == labelDA && labelSB != labelDB) {
 		dasLog.innerHTML += '<p>The first pair has matching labels while the second one does not, preferring the first pair.</p>' ;
@@ -332,8 +319,8 @@ function compareDestination(a, b) {
 	}
 	dasLog.innerHTML += '<p>Both pairs have matching labels, continuing with next rule.</p>' +
 		'<h4>Rule 6: Prefer higher precedence</h4>' ;
-	let precedenceDA = getPrecedence(a.destination) ;
-	let precedenceDB = getPrecedence(b.destination) ;
+	let precedenceDA = policy.getPrecedence(a.destination) ;
+	let precedenceDB = policy.getPrecedence(b.destination) ;
 	if (precedenceDA > precedenceDB) {
 		dasLog.innerHTML += '<p>Precedence of ' + a.destination.toString() + '(' + precedenceDA + ') is greater than the precedence of ' +
 			b.destination.toString() + '(' + precedenceDB + '), therefore ' + a.destination.toString() + ' is selected.</p>' ;
