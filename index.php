@@ -77,6 +77,15 @@ Address#2: <input type="text" id="dst2" onkeyup="addrChanged(this);" length="32"
 <span id="span_dst2"></span>
 </div><!-- col -->
 </div><!--row-->
+<div class="row">
+<p>Or select an example set of addresses from RFC 6724 sections 10.1 and 10.2:
+<select id="setId" onchange="addressesChanged(this);" name="addressesSet">
+<option value="1">1</option>
+<option value="2">2</option>
+<option value="3">3</option>
+<option value="4">4</option>
+</select>
+</div><!--row-->
 <hr>
 <div class="row">
 <div id="policy" class="col-md-6 w-auto"></div><!-- policy-->

@@ -111,6 +111,28 @@ function scopeToString(a) {
 	return 'unknown' ;
 }
 
+// Called when another set of example addresses set is selected
+// Merely by loading a file
+function addressesChanged(elem) {
+	let n = elem.value ;
+	fetch('example_' + n + '.json')
+		.then((response) => response.json())
+		.then((json) => changeAddresses(json)) ;
+}
+
+// CHange all the input boxes based on the addressesChanged call-back
+function changeAddresses(json) {
+	document.getElementById('src1').value = json.src1 ;
+	document.getElementById('src2').value = json.src2 ;
+	document.getElementById('dst1').value = json.dst1 ;
+	if (typeof(json.dst2) == 'undefined')
+		document.getElementById('dst2').value = '' ;
+	else
+		document.getElementById('dst2').value = json.dst2 ;
+	selectAddress() ;
+}
+
+// Called when one input box has changed
 function addrChanged(elem) {
 	if (elem.value == '') return ;
 	document.getElementById('sas').innerHTML = '' ;
@@ -128,6 +150,10 @@ function addrChanged(elem) {
 	elem.style.borderColor = 'initial' ;
 	scope = getScope(a) ;
 	span.innerHTML = '<i class="bi bi-check-circle-fill text-success"></i>Scope: ' + scopeName[scope] + ', precedence: ' + policy.getPrecedence(a) + ', label: ' + policy.getLabel(a);
+	selectAddress() ;
+}
+
+function selectAddress() {
 	// Let's recompute everything
 	// Let's look at all src for all dst
 	addressPairs = [] ;
@@ -307,6 +333,7 @@ function runSourceRules(dstId) {
 // generate HTML with the selected address(es) for destination
 function displaySources(dstId) {
 	let dst = document.getElementById(dstId).value ;
+	if (dst == '') return ;
 	let d =ipaddr.parse(dst) ;
 	let s = '<p class="text-info">The selected source address(es) for destination ' + d.toString() + ' is/are: ' ;
 	for (let i = 0 ; i < addressPairs.length ; i++) {
