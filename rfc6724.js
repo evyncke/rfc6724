@@ -151,10 +151,17 @@ function addrChanged(elem) {
 }
 
 function selectAddress() {
-  // Is there any work to be done ?
-  if (document.getElementById('src1').value == '') return ;
-  if (document.getElementById('src2').value == '') return ;
-  if (document.getElementById('dst1').value == '') return ;
+	// Is there any work to be done ?
+	if (document.getElementById('src1').value == '') return ;
+	if (document.getElementById('src2').value == '') return ;
+	if (document.getElementById('dst1').value == '') return ;
+	// Let's save the parameters in the link
+	document.getElementById('pageURL').href = window.location.protocol + '//' + window.location.hostname +
+		'/?policy=' + document.getElementById('policySelect').value +
+		'&src1=' + document.getElementById('src1').value +
+		'&src2=' + document.getElementById('src2').value +
+		'&dst1=' + document.getElementById('dst1').value +
+		'&dst2=' + document.getElementById('dst2').value ;
 	// Let's recompute everything
 	// Let's look at all src for all dst
 	addressPairs = [] ;
@@ -449,11 +456,11 @@ function compareDestination(a, b, detailsDivId) {
 }
 
 function changePolicy(json) {
-  policy = new RFC6724policy(json.policyName) ;
-  for (let i = 0; i < json.rows.length ; i++)
-    policy.add(json.rows[i].name, json.rows[i].prefix, json.rows[i].prefixLength, json.rows[i].precedence, json.rows[i].label) ;
+	policy = new RFC6724policy(json.policyName) ;
+	for (let i = 0; i < json.rows.length ; i++)
+		policy.add(json.rows[i].name, json.rows[i].prefix, json.rows[i].prefixLength, json.rows[i].precedence, json.rows[i].label) ;
 	document.getElementById('policy').innerHTML = policy.toHTML() ;
-  selectAddress() ;
+	selectAddress() ;
 }
 
 function loadPolicy(name) {
@@ -462,8 +469,10 @@ function loadPolicy(name) {
 		.then((json) => changePolicy(json)) ;
 }
 
-function init() {
+function init(policyName) {
 	// Fill in the policy
-  loadPolicy('rfc6724') ;
+	loadPolicy(policyName) ;
+	// TODO check for race conditions as the loadPolicy is asynchronous...
+	document.getElementById('policySelect').value = policyName ;
 	document.getElementById('policy').innerHTML = policy.toHTML() ;
 }

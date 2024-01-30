@@ -15,6 +15,13 @@
    limitations under the License.
 -->
 <!-- TODO create a HTML link to the set of addresses + policy -->
+<?php
+$policy = (isset($_REQUEST['policy']) and $_REQUEST['policy'] != '') ? basename($_REQUEST['policy']) : 'rfc6724' ;
+$src1 = (isset($_REQUEST['src1'])) ? trim($_REQUEST['src1']) : '' ;
+$src2 = (isset($_REQUEST['src2'])) ? trim($_REQUEST['src2']) : '' ;
+$dst1 = (isset($_REQUEST['dst1'])) ? trim($_REQUEST['dst1']) : '' ;
+$dst2 = (isset($_REQUEST['dst2'])) ? trim($_REQUEST['dst2']) : '' ;
+?>
 <head>
 <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
 <meta charset="utf-8">
@@ -51,14 +58,14 @@ Using code from https://github.com/whitequark/ipaddr.js
 </script>
 <!-- End Matomo Code -->
 </head>
-<body onload="init();">
+<body onload="init('<?=$policy?>');">
 <h1>RFC 6724 on-line</h1>
 
 <p><small>You need to input two valid source IPv4/IPv6 addresses and at least one valid destination IPv4/IPv6 address.
 The address scope, label, and preference are automatically computed and displayed. As soon as
 two source addresses and at least one destination address are validated, then the best
 pair of source and destination is evaluated against
-<select onchange="loadPolicy(this.value);">
+<select id="policySelect" onchange="loadPolicy(this.value);">
 <option value="rfc6724">RFC 6724</option>
 <option value="rfc3484">RFC 3484</option>
 <option value="linux-5.15">linux-5.15 (2024)</option>
@@ -68,19 +75,19 @@ pair of source and destination is evaluated against
 <div class="row">
 <div class="col-xs-12 col-md-6">
 <h2>Source addresses</h2>
-Address#1: <input type="text" id="src1" onkeyup="addrChanged(this);" length="32" placeholder="2001:db8::1">
+Address#1: <input type="text" id="src1" onkeyup="addrChanged(this);" length="32" placeholder="2001:db8::1" value="<?=$src1?>">
 <span id="span_src1"></span>
 <br/>
-Address#2: <input type="text" id="src2" onkeyup="addrChanged(this);" length="32" placeholder="Any IPv4/IPv6 address">
+Address#2: <input type="text" id="src2" onkeyup="addrChanged(this);" length="32" placeholder="Any IPv4/IPv6 address" value="<?=$src2?>">
 <span id="span_src2"></span>
 </div><!-- col -->
 
 <div class="col-xs-12 col-md-6">
 <h2>Destination address(es)</h2>
-Address#1: <input type="text" id="dst1" onkeyup="addrChanged(this);" length="32" placeholder="2001:db8:2::1">
+Address#1: <input type="text" id="dst1" onkeyup="addrChanged(this);" length="32" placeholder="2001:db8:2::1" value="<?=$dst1?>">
 <span id="span_dst1"></span>
 <br/>
-Address#2: <input type="text" id="dst2" onkeyup="addrChanged(this);" length="32" placeholder="Can be empty">
+Address#2: <input type="text" id="dst2" onkeyup="addrChanged(this);" length="32" placeholder="Can be empty" value="<?=$dst2?>">
 <span id="span_dst2"></span>
 </div><!-- col -->
 </div><!--row-->
@@ -104,6 +111,10 @@ Address#2: <input type="text" id="dst2" onkeyup="addrChanged(this);" length="32"
 <option value="99">99 - draft-ietf-6man-rfc6724-update: IPv4-IPv4 preferred over ULA-GUA</option>
 </select>
 </p>
+</div><!--row-->
+<div class="row">
+<p>Link to this page (to share the address set + policy choice):<a id="pageURL" href="<?=$_SERVER['PHP_SELF']?>"><i class="bi bi-link-45deg"></i></a>
+<i class="bi bi-copy link-primary" onclick="navigator.clipboard.writeText(document.getElementById('pageURL').href)"></i>.</p>
 </div><!--row-->
 <hr>
 <div class="row">
