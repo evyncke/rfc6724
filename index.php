@@ -80,11 +80,22 @@ Address#2: <input type="text" id="dst2" onkeyup="addrChanged(this);" length="32"
 <div class="row">
 <p>Or select an example set of addresses from RFC 6724 sections 10.1 and 10.2:
 <select id="setId" onchange="addressesChanged(this);" name="addressesSet">
-<option value="1">1</option>
-<option value="2">2</option>
-<option value="3">3</option>
-<option value="4">4</option>
+<option value="1">1 - Source: prefer appropriate scope</option>
+<option value="2">2 - Source: prefer appropriate scope</option>
+<option value="3">3 - Source: prefer same address</option>
+<option value="4">4 - Source: prefer appropriate scope</option>
+<option value="5">5 - Source: longest matching prefix</option>
+<option value="7">7 - Source: prefer matching label</option>
+<option value="9">9 - Destination: prefer matching scope</option>
+<option value="10">10 - Destination: prefer matching scope</option>
+<option value="11">11 - Destination: prefer higher precedence</option>
+<option value="12">12 - Destination: prefer smaller scope</option>
+<option value="15">15 - Destination: longest matching prefix</option>
+<option value="16">16 - Destination: prefer matching label</option>
+<option value="17">17 - Destination: prefer higher precedence</option>
+<option value="99">99 - draft-ietf-6man-rfc6724-update</option>
 </select>
+</p>
 </div><!--row-->
 <hr>
 <div class="row">
