@@ -27,8 +27,9 @@ class RFC6724policyRow {
 }
 
 class RFC6724policy {
-	constructor() {
+	constructor(policyName) {
 		this.rows = [] ;
+    this.policyName = policyName ;
 	}
 	add(name, prefix, prefixLength, precedence, label) {
 		this.rows.push(new RFC6724policyRow(name, prefix, prefixLength, precedence, label)) ;
@@ -55,7 +56,7 @@ class RFC6724policy {
 	}
 	toHTML() {
 		let s = '<table class="table table-hover table-striped table-bordered caption-top">' +
-			'<caption class="text-center">RFC 6724 policy table</caption>' +
+			'<caption class="text-center">' + this.policyName + ' policy table</caption>' +
 			'<thead><tr><th>Type</th><th>Prefix</th><th>Precedence</th><th>Label</th></tr></thead>' +
 			'<tbody class="table-divider">' ;
 		for (let i = 0 ; i < this.rows.length; i++)
@@ -189,7 +190,7 @@ function selectAddress() {
 	} else {
 		document.getElementById('das').innerHTML = '<p class="text-warning">Cannot select the source/destination addresses.</p>' ;
 	}
-	// Let's log the input addresses
+	// Let's log the input addresses set 
 	if (document.getElementById('dst2').value == '')
 		console.log(JSON.stringify({src1: document.getElementById('src1').value, src2: document.getElementById('src2').value,
 			dst1: document.getElementById('dst1').value})) ;
@@ -336,7 +337,7 @@ function runSourceRules(dstId) {
 // generate HTML with the selected address(es) for destination
 function displaySources(dstId) {
 	let dst = document.getElementById(dstId).value ;
-	if (dst == '') return ;
+	if (dst == '') return '';
 	let d =ipaddr.parse(dst) ;
 	let s = '<p class="text-info">The selected source address(es) for destination ' + d.toString() + ' is/are: ' ;
 	for (let i = 0 ; i < addressPairs.length ; i++) {
@@ -431,41 +432,21 @@ function compareDestination(a, b, detailsDivId) {
 	return 1 ;
 }
 
+function changePolicy(json) {
+  policy = new RFC6724policy(json.policyName) ;
+  for (let i = 0; i < json.rows.length ; i++)
+    policy.add(json.rows[i].name, json.rows[i].prefix, json.rows[i].prefixLength, json.rows[i].precedence, json.rows[i].label) ;
+	document.getElementById('policy').innerHTML = policy.toHTML() ;
+}
+
+function loadPolicy(name) {
+	fetch('policy_' + name + '.json')
+		.then((response) => response.json())
+		.then((json) => changePolicy(json)) ;
+}
+
 function init() {
 	// Fill in the policy
-	policy.add('loopback', '::1', 128, 50, 0) ;
-	policy.add('default', '::', 0, 40, 1) ;
-	policy.add('IPv4 mapped','::ffff:0:0', 96, 35, 4) ;
-	policy.add('6to4', '2002::', 16, 30, 2) ;
-	policy.add('teredo', '2001::', 32, 5, 5) ;
-	policy.add('ULA', 'fc00::', 7, 3, 13) ;
-	policy.add('IPv4-compatible', '::', 96, 1, 3) ;
-	policy.add('Site-local (deprecated)', 'fec0::', 10, 1, 11) ;
-	policy.add('6bone (returned)', '3ffe::', 16, 1, 12) ;
+  loadPolicy('rfc6724') ;
 	document.getElementById('policy').innerHTML = policy.toHTML() ;
-
-	// Some tests
-	document.getElementById('src1').value = '2001:db8::1' ;
-	document.getElementById('src2').value = 'fe80::1' ;
-	document.getElementById('dst1').value = 'ff02::1' ;
-	document.getElementById('dst2').value = 'ff05::1' ;
-	// Two globals but with different labels
-	document.getElementById('src1').value = '2002:c633:6401::d5e3:7953:13eb:22e8' ;
-	document.getElementById('src2').value = '2001:db8:1::2' ;
-	document.getElementById('dst1').value = '2002:c633:6401::1' ;
-	// Two globals but with different length of prefix matching
-	document.getElementById('src1').value = '2001:db8:cafe:babe::1' ;
-	document.getElementById('src2').value = '2001:db8:dead:beef::1' ;
-	document.getElementById('dst1').value = '2001:db8:c0ca:babe::2' ;
-	// Two globals but with different length of prefix matching and two dest
-	document.getElementById('src1').value = '2001:db8:cafe:babe::1' ;
-	document.getElementById('src2').value = '2001:db8:dead:beef::1' ;
-	document.getElementById('dst1').value = '2001:db8:c0ca:babe::2' ;
-	document.getElementById('dst2').value = '2001:db8:beef:babe::2' ;
-	return ;
-	// Two globals but with different length of prefix matching and two dest including ULA
-	document.getElementById('src1').value = '2001:db8:cafe:babe::1' ;
-	document.getElementById('src2').value = 'fd00:dead:beef::1' ;
-	document.getElementById('dst1').value = '2001:db8:c0ca:babe::2' ;
-	document.getElementById('dst2').value = 'fc00:dead:c0ca:babe::2' ;
 }
