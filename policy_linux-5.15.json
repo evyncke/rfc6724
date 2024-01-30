@@ -1,0 +1,61 @@
+{
+  "policyName": "5.15.0-92-generic (2024)",
+  "rows": [
+    {
+      "name": "loopback",
+      "prefix": "::1",
+      "prefixLength": 128,
+      "precedence": 50,
+      "label": 0
+    },
+    {
+      "name": "default",
+      "prefix": "::",
+      "prefixLength": 0,
+      "precedence": 40,
+      "label": 1
+    },
+    {
+      "name": "IPv4 mapped",
+      "prefix": "::ffff:0:0",
+      "prefixLength": 96,
+      "precedence": 10,
+      "label": 4
+    },
+    {
+      "name": "6to4",
+      "prefix": "2002::",
+      "prefixLength": 16,
+      "precedence": 30,
+      "label": 2
+    },
+    {
+      "name": "teredo",
+      "prefix": "2001::",
+      "prefixLength": 32,
+      "precedence": 40,
+      "label": 7
+    },
+    {
+      "name": "ULA",
+      "prefix": "fc00::",
+      "prefixLength": 7,
+      "precedence": 40,
+      "label": 6
+    },
+    {
+      "name": "IPv4-compatible",
+      "prefix": "::",
+      "prefixLength": 96,
+      "precedence": 20,
+      "label": 3
+    },
+    {
+      "name": "Site-local (deprecated)",
+      "prefix": "fec0::",
+      "prefixLength": 10,
+      "precedence": 40,
+      "label": 5
+    },
+  ]
+}
