@@ -56,30 +56,36 @@ Using code from https://github.com/whitequark/ipaddr.js
 <p><small>You need to input two valid source IPv4/IPv6 addresses and at least one valid destination IPv4/IPv6 address.
 The address scope, label, and preference are automatically computed and displayed. As soon as
 two source addresses and at least one destination address are validated, then the best
-pair of source and destination is evaluated against RFC 6724.</small></p>
+pair of source and destination is evaluated against
+<select onchange="loadPolicy(this.value);">
+<option value="rfc6724">RFC 6724</option>
+<option value="rfc3484">RFC 3484</option>
+<option value="linux-5.15">linux-5.15 (2024)</option>
+<option value="rfc6724-bis">draft-ietf-6man-rfc6724-update-06</option>
+</select>.</small></p>
 
 <div class="row">
 <div class="col-xs-12 col-md-6">
 <h2>Source addresses</h2>
-Address#1: <input type="text" id="src1" onkeyup="addrChanged(this);" length="32">
+Address#1: <input type="text" id="src1" onkeyup="addrChanged(this);" length="32" placeholder="2001:db8::1">
 <span id="span_src1"></span>
 <br/>
-Address#2: <input type="text" id="src2" onkeyup="addrChanged(this);" length="32">
+Address#2: <input type="text" id="src2" onkeyup="addrChanged(this);" length="32" placeholder="Any IPv4/IPv6 address">
 <span id="span_src2"></span>
 </div><!-- col -->
 
 <div class="col-xs-12 col-md-6">
 <h2>Destination address(es)</h2>
-Address#1: <input type="text" id="dst1" onkeyup="addrChanged(this);" length="32">
+Address#1: <input type="text" id="dst1" onkeyup="addrChanged(this);" length="32" placeholder="2001:db8:2::1">
 <span id="span_dst1"></span>
 <br/>
-Address#2: <input type="text" id="dst2" onkeyup="addrChanged(this);" length="32">
+Address#2: <input type="text" id="dst2" onkeyup="addrChanged(this);" length="32" placeholder="Can be empty">
 <span id="span_dst2"></span>
 </div><!-- col -->
 </div><!--row-->
 <div class="row">
 <p>Or select an example set of addresses from RFC 6724 sections 10.1 and 10.2:
-<select id="setId" onchange="addressesChanged(this);" name="addressesSet">
+<select id="setId" onchange="addressesChanged(this);" name="addressesSet" class="form-select w-auto">
 <option value="1">1 - Source: prefer appropriate scope</option>
 <option value="2">2 - Source: prefer appropriate scope</option>
 <option value="3">3 - Source: prefer same address</option>
