@@ -1,5 +1,5 @@
 {
-  "policyName": "5.15.0-92-generic (2024)",
+  "policyName": "Linux 5.15.0-92-generic (2024)",
   "rows": [
     {
       "name": "loopback",
