@@ -14,6 +14,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 -->
+<!-- TODO create a HTML link to the set of addresses + policy -->
 <head>
 <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
 <meta charset="utf-8">
@@ -43,7 +44,7 @@ Using code from https://github.com/whitequark/ipaddr.js
   (function() {
       var u="//analytics.vyncke.org/";
       _paq.push(['setTrackerUrl', u+'matomo.php']);
-      _paq.push(['setSiteId', '1']);
+      _paq.push(['setSiteId', '7']);
       var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
       g.type='text/javascript'; g.async=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
    })();
@@ -99,7 +100,8 @@ Address#2: <input type="text" id="dst2" onkeyup="addrChanged(this);" length="32"
 <option value="15">15 - Destination: longest matching prefix</option>
 <option value="16">16 - Destination: prefer matching label</option>
 <option value="17">17 - Destination: prefer higher precedence</option>
-<option value="99">99 - draft-ietf-6man-rfc6724-update</option>
+<option value="98">98 - draft-ietf-6man-rfc6724-update: ULA-ULA preferred over IPv4-IPv4</option>
+<option value="99">99 - draft-ietf-6man-rfc6724-update: IPv4-IPv4 preferred over ULA-GUA</option>
 </select>
 </p>
 </div><!--row-->
