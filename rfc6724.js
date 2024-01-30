@@ -151,6 +151,10 @@ function addrChanged(elem) {
 }
 
 function selectAddress() {
+  // Is there any work to be done ?
+  if (document.getElementById('src1').value == '') return ;
+  if (document.getElementById('src2').value == '') return ;
+  if (document.getElementById('dst1').value == '') return ;
 	// Let's recompute everything
 	// Let's look at all src for all dst
 	addressPairs = [] ;
@@ -162,9 +166,9 @@ function selectAddress() {
 	// Check the best pair <src, dst>
 	if (addressPairs.length == 1) {
 		document.getElementById('das').innerHTML = '<h2>Destination address selection</h2>' +
-			'There is only one selected pair of <source, destination> addresses, i.e., the selected source is ' +
+			'<p class="text-info">There is only one selected pair of <source, destination> addresses, i.e., the selected source is ' +
 			addressPairs[0].source.toString() + ' and the destination is ' +
-			addressPairs[0].destination.toString() + '.' ;
+			addressPairs[0].destination.toString() + '.</p>' ;
 	} else if (addressPairs.length > 0) {
 		document.getElementById('das').innerHTML = '<h2>Destination address selection</h2>' +
 			'There are ' + addressPairs.length + ' selected pair(s) of &lt;source, destination&gt; addresses:<ol>' ;
@@ -184,8 +188,9 @@ function selectAddress() {
 			else
 				addressPairs.splice(1, 1) ;
 		}
+    // TODO also highlight the input boxes ?
 		document.getElementById('das').innerHTML += '<h2>Final selected addresses</h2>' +
-			'<p>The best pair of &lt;source, destination&gt; is: &lt;' +
+			'<p class="text-info">The best pair of &lt;source, destination&gt; is: &lt;' +
 			addressPairs[0].source.toString() + ', ' + addressPairs[0].destination.toString() + '&gt;.</p>' ;
 	} else {
 		document.getElementById('das').innerHTML = '<p class="text-warning">Cannot select the source/destination addresses.</p>' ;
@@ -417,19 +422,37 @@ function compareDestination(a, b, detailsDivId) {
 	scopeDA = getScope(a.destination) ;
 	scopeDB = getScope(b.destination) ;
 	if (scopeDA < scopeDB) {
-		dasLog.innerHTML += '<p>The scope of the first destination address (' + scopeDA + ') is less than the scope of the second address (' + scopeDB + '), ' +
+		dasLog.innerHTML += '<p>The scope of the first destination address (' + scopeName[scopeDA] + ') is less than the scope of the second address (' + scopeName[scopeDB] + '), ' +
 			'then the first address, ' + a.destination.toString() + ', is preferred.</p>' ;
 		return +1 ;
 	}
 	if (scopeDA > scopeDB) {
-		dasLog.innerHTML += '<p>The scope of the second destination address (' + scopeDB + ') is less than the scope of the first address (' + scopeDA + '), ' +
+		dasLog.innerHTML += '<p>The scope of the second destination address (' + scopeName[scopeDB] + ') is less than the scope of the first address (' + scopeName[scopeDA] + '), ' +
 			'then the second address, ' + b.destination.toString() + ', is preferred.</p>' ;
 		return -1 ;
 	}
 	// TODO display scope names rather than numbers
-	dasLog.innerHTML += '<p>The scopes of both destination addresses are identical (' + scopeDA + '), continuing to next rule.</p>' +
+	dasLog.innerHTML += '<p>The scopes of both destination addresses are identical (' + scopeName[scopeDA] + '), continuing to next rule.</p>' +
 		'<h4>Rule 9: Use longest matching prefix</h4>' ;
-	return 1 ;
+  if (a.destination.kind() == b.destination.kind()) {
+      let commonPrefixA = a.source.commonPrefixLength(a.destination) ;
+      let commonPrefixB = b.source.commonPrefixLength(b.destination) ;
+      if (commonPrefixA > commonPrefixB) {
+        dasLog.innerHTML += '<p>First address pair has a longer (' + commonPrefixA + ') common prefix than the second address pair (' + commonPrefixB + 
+          '); first address pair is selected.</p>' ;
+          return +1 ;
+    } else if (commonPrefixA < commonPrefixB) {
+        dasLog.innerHTML += '<p>Second address pair has a longer (' + commonPrefixB + ') common prefix than the first address pair (' + commonPrefixA + 
+          '); second address pair is selected.</p>' ;
+          return -1 ;
+      } else {
+        dasLog.innerHTML += '<p>Both address pairs have the same length of common prefix (' + commonPrefixA + '), continuing with the next rule.</p>' ;
+      }
+  } else {
+    dasLog.innerHTML += '<p>The address families of the destination addresses are different, skipping this rule.</p>' ;
+  }
+  dasLog.innerHTML += '<h4>Rule 10:  Otherwise, leave the order unchanged</h4>' ;
+	return +1 ;
 }
 
 function changePolicy(json) {
@@ -437,6 +460,7 @@ function changePolicy(json) {
   for (let i = 0; i < json.rows.length ; i++)
     policy.add(json.rows[i].name, json.rows[i].prefix, json.rows[i].prefixLength, json.rows[i].precedence, json.rows[i].label) ;
 	document.getElementById('policy').innerHTML = policy.toHTML() ;
+  selectAddress() ;
 }
 
 function loadPolicy(name) {
