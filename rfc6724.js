@@ -126,27 +126,34 @@ function changeAddresses(json) {
 		document.getElementById('dst2').value = '' ;
 	else
 		document.getElementById('dst2').value = json.dst2 ;
-	selectAddress() ;
+	addrChanged() ;
 }
 
 // Called when one input box has changed
-function addrChanged(elem) {
-	if (elem.value == '') return ;
+function addrChanged() {
+	// Addresses have changed, clean up any previous log
 	document.getElementById('sas').innerHTML = '' ;
 	document.getElementById('das').innerHTML = '' ;
-	let span = document.getElementById('span_' + elem.id) ;
-	try {
-		var a = ipaddr.parse(elem.value) ;
-	} catch (err) {
-		span.innerHTML = '<i class="bi bi-ban-fill text-danger"></i>' ;
-		elem.style.borderColor = 'red' ;
-		elem.style.color = 'red' ;
-		return ;
+	let allElements = ['src1', 'src2', 'dst1', 'dst2'] ;
+	for (let i = 0; i < allElements.length ; i++) {
+		let elem = document.getElementById(allElements[i]) ;
+		let span = document.getElementById('span_' + allElements[i]) ;
+		span.innerHTML = '' ;
+		elem.style.color = 'initial' ;
+		elem.style.borderColor = 'initial' ;
+		if (elem.value == '') continue ;
+		try {
+			var a = ipaddr.parse(elem.value) ;
+		} catch (err) {
+			span.innerHTML = '<i class="bi bi-ban-fill text-danger"></i>' ;
+			elem.style.borderColor = 'red' ;
+			elem.style.color = 'red' ;
+			return ;
+		}
+		scope = getScope(a) ;
+		span.innerHTML = '<i class="bi bi-check-circle-fill text-success"></i>Scope: ' + scopeName[scope] + ', precedence: ' + policy.getPrecedence(a) + ', label: ' + policy.getLabel(a);
 	}
-	elem.style.color = 'initial' ;
-	elem.style.borderColor = 'initial' ;
-	scope = getScope(a) ;
-	span.innerHTML = '<i class="bi bi-check-circle-fill text-success"></i>Scope: ' + scopeName[scope] + ', precedence: ' + policy.getPrecedence(a) + ', label: ' + policy.getLabel(a);
+	// Now recompte everything
 	selectAddress() ;
 }
 
@@ -459,8 +466,10 @@ function changePolicy(json) {
 	policy = new RFC6724policy(json.policyName) ;
 	for (let i = 0; i < json.rows.length ; i++)
 		policy.add(json.rows[i].name, json.rows[i].prefix, json.rows[i].prefixLength, json.rows[i].precedence, json.rows[i].label) ;
+	// Display the new policy table
 	document.getElementById('policy').innerHTML = policy.toHTML() ;
-	selectAddress() ;
+	// Label and precedence may have changed => Redisplay and recompte
+	addrChanged() ;
 }
 
 function loadPolicy(name) {

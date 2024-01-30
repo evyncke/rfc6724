@@ -108,19 +108,19 @@ pair of source and destination is evaluated against
 <div class="row">
 <div class="col-xs-12 col-md-6">
 <h3>Source</h3>
-Address#1: <input type="text" id="src1" onkeyup="addrChanged(this);" length="32" placeholder="2001:db8::1" value="<?=$src1?>">
+Address#1: <input type="text" id="src1" onkeyup="addrChanged();" length="32" placeholder="2001:db8::1" value="<?=$src1?>">
 <span id="span_src1"></span>
 <br/>
-Address#2: <input type="text" id="src2" onkeyup="addrChanged(this);" length="32" placeholder="Any IPv4/IPv6 address" value="<?=$src2?>">
+Address#2: <input type="text" id="src2" onkeyup="addrChanged();" length="32" placeholder="Any IPv4/IPv6 address" value="<?=$src2?>">
 <span id="span_src2"></span>
 </div><!-- col -->
 
 <div class="col-xs-12 col-md-6">
 <h3>Destination</h3>
-Address#1: <input type="text" id="dst1" onkeyup="addrChanged(this);" length="32" placeholder="2001:db8:2::1" value="<?=$dst1?>">
+Address#1: <input type="text" id="dst1" onkeyup="addrChanged();" length="32" placeholder="2001:db8:2::1" value="<?=$dst1?>">
 <span id="span_dst1"></span>
 <br/>
-Address#2: <input type="text" id="dst2" onkeyup="addrChanged(this);" length="32" placeholder="Can be empty" value="<?=$dst2?>">
+Address#2: <input type="text" id="dst2" onkeyup="addrChanged();" length="32" placeholder="Can be empty" value="<?=$dst2?>">
 <span id="span_dst2"></span>
 </div><!-- col -->
 </div><!--row-->
