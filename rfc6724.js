@@ -189,6 +189,13 @@ function selectAddress() {
 	} else {
 		document.getElementById('das').innerHTML = '<p class="text-warning">Cannot select the source/destination addresses.</p>' ;
 	}
+	// Let's log the input addresses
+	if (document.getElementById('dst2').value == '')
+		console.log(JSON.stringify({src1: document.getElementById('src1').value, src2: document.getElementById('src2').value,
+			dst1: document.getElementById('dst1').value})) ;
+	else
+		console.log(JSON.stringify({src1: document.getElementById('src1').value, src2: document.getElementById('src2').value,
+			dst1: document.getElementById('dst1').value, dst2: document.getElementById('dst2').value})) ;
 }
 
 function runSourceRules(dstId) {
