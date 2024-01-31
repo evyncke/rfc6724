@@ -134,6 +134,11 @@ Address#2: <input type="text" id="dst2" onkeyup="addrChanged();" length="32" pla
 
 <span id="sas"></span>
 <span id="das"></span>
+<hr>
+<p><small>This page and associated Javascript and JSON data files is open source, it is available on the IPv4-only
+<a href="https://github.com/evyncke/rfc6724">https://github.com/evyncke/rfc6724</a>. Thanks to Whitequark for their
+<a href="https://github.com/whitequark/ipaddr.js">ipaddr.js</a> library.
+</small></p>
 </div><!-- container-->
 </body>
 </html>
