@@ -16,7 +16,7 @@
       "label": 1
     },
     {
-      "name": "IPv4 mapped",
+      "name": "IPv4-mapped",
       "prefix": "::ffff:0:0",
       "prefixLength": 96,
       "precedence": 35,
