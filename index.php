@@ -69,7 +69,7 @@ Using code from https://github.com/whitequark/ipaddr.js
 
 <h1 class="display-1">RFC 6724 on-line</h1>
 
-<p><small>You need to input two valid source IPv4/IPv6 addresses and at least one valid destination IPv4/IPv6 address.
+<p><em>You need to input two valid source IPv4/IPv6 addresses and at least one valid destination IPv4/IPv6 address.
 The address scope, label, and preference are automatically computed and displayed. As soon as
 two source addresses and at least one destination address are validated, then the best
 pair of source and destination is evaluated against
@@ -78,11 +78,12 @@ pair of source and destination is evaluated against
 <option value="rfc3484">RFC 3484</option>
 <option value="linux-5.15">linux-5.15 (2024)</option>
 <option value="rfc6724-bis">draft-ietf-6man-rfc6724-update-06</option>
-</select>. Click on <i class="bi bi-chevron-expand text-primary"></i> to expand the rule evaluation.</small></p>
+</select> policy (please contact me -- see github -- if you know about other policies).
+Click on <i class="bi bi-chevron-expand text-primary"></i> to expand the rule evaluation.</em></p>
 
 <div class="row">
 <h2>Addresses</h2>
-<p><small>Please enter the IPv4/IPv6 addresses below or select an example set of addresses from RFC 6724 sections 10.1 and 10.2:
+<p>Please enter the IPv4/IPv6 addresses below or select an example set of addresses from RFC 6724 sections 10.1 and 10.2:
 <select id="setId" onchange="addressesChanged(this);" name="addressesSet" class="form-select w-auto">
 <option disabled>Preload address examples from RFC 6724</option>
 <option value="1">1 - Source: prefer appropriate scope</option>
