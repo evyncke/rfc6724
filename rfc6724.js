@@ -46,6 +46,10 @@ class RFC6724policy {
 				}
 		return this.rows[bestRow] ; // Assuming that there will be a matching row
 	}
+	getName(a) {
+		let row = this.getPolicy(a) ;
+		return row.name ;
+	}
 	getLabel(a) {
 		let row = this.getPolicy(a) ;
 		return row.label ;
@@ -151,7 +155,8 @@ function addrChanged() {
 			return ;
 		}
 		scope = getScope(a) ;
-		span.innerHTML = '<i class="bi bi-check-circle-fill text-success"></i>Scope: ' + scopeName[scope] + ', precedence: ' + policy.getPrecedence(a) + ', label: ' + policy.getLabel(a);
+		span.innerHTML = '<small><i class="bi bi-check-circle-fill text-success"></i> ' + policy.getName(a) + ': ' + scopeName[scope] +
+			' scope, precedence: ' + policy.getPrecedence(a) + ', label: ' + policy.getLabel(a) + '</small>';
 	}
 	// Now recompte everything
 	selectAddress() ;
@@ -185,13 +190,14 @@ function selectAddress() {
 			addressPairs[0].destination.toString() + '.</p>' ;
 	} else if (addressPairs.length > 0) {
 		document.getElementById('das').innerHTML = '<h2>Destination address selection</h2>' +
-			'There are ' + addressPairs.length + ' selected pair(s) of &lt;source, destination&gt; addresses:<ol>' ;
+			'<div class="container">' +
+			'There are ' + addressPairs.length + ' selected pair(s) of &lt;source, destination&gt; addresses:<ol class="list-group list-group-numbered">' ;
 		for (var i = 0; i < addressPairs.length; i++) {
-			document.getElementById('das').innerHTML += '<li> &lt;' +
+			document.getElementById('das').innerHTML += '<li class="list-group-item"> &lt;' +
 				addressPairs[i].source.toString() + ', ' +
 				addressPairs[i].destination.toString() + '&gt;</li>' ;
 		}
-		document.getElementById('das').innerHTML += '</ol>' ;	
+		document.getElementById('das').innerHTML += '</ol></div><!--container-->' ;	
 		// Need to compare each pair to another pair and select the winner...
 		// loop until only one pair is left in the array, comparing one entry to the next one
 		// and keeping only one (the best or any if equivalent) by using .splice() method ?
@@ -209,6 +215,12 @@ function selectAddress() {
 	} else {
 		document.getElementById('das').innerHTML = '<p class="text-warning">Cannot select the source/destination addresses.</p>' ;
 	}
+	// Highlight the select boxes containing the addresses, assuming that addresses are in canonical format...
+	if (addressPairs.length != 1) return ;
+	if (document.getElementById('src1').value == addressPairs[0].source.toString()) document.getElementById('src1').style.color = 'blue' ;
+	if (document.getElementById('src2').value == addressPairs[0].source.toString()) document.getElementById('src2').style.color = 'blue' ;
+	if (document.getElementById('dst1').value == addressPairs[0].destination.toString()) document.getElementById('dst1').style.color = 'blue' ;
+	if (document.getElementById('dst2').value == addressPairs[0].destination.toString()) document.getElementById('dst2').style.color = 'blue' ;
 }
 
 function runSourceRules(dstId) {
