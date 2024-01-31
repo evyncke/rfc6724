@@ -102,6 +102,8 @@ Click on <i class="bi bi-chevron-expand text-primary"></i> to expand the rule ev
 <option disabled>-- About draft-ietf-6man-rfc6724-update --</option>
 <option value="98">98 - draft-ietf-6man-rfc6724-update: ULA-ULA preferred over IPv4-IPv4</option>
 <option value="99">99 - draft-ietf-6man-rfc6724-update: IPv4-IPv4 preferred over ULA-GUA</option>
+<option disabled>-- About draft-ietf-6man-rfc6724-update --</option>
+<option value="100">100 - Other: deprecated site local</option>
 </select>
 </p>
 </div><!-- row -->
